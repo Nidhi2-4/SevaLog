@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import logo from "figma:asset/85248772586b99de15e77f83e48a42b2a67f744d.png";
+import logo from "/logo.png";
 
 export function Navbar() {
   const navigate = useNavigate();
