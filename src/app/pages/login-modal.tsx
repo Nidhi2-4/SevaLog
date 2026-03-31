@@ -26,15 +26,15 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
       .from("ngos")
       .select("*")
       .eq("email", email)
+      .eq("password", password)
       .single();
 
     if (dbError || !data) {
-      setError("Invalid email or NGO not found.");
+      setError("Invalid email or password.");
       setLoading(false);
       return;
     }
 
-    // Store NGO info in localStorage for session
     localStorage.setItem("ngo_id", data.id);
     localStorage.setItem("ngo_name", data.name);
     localStorage.setItem("ngo_email", data.email);
@@ -49,17 +49,16 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
     setLoading(true);
     setError("");
 
-    // For verifiers, any valid email format works for now
-    if (!email.includes("@")) {
-      setError("Please enter a valid email.");
+    // Hardcoded verifier credentials for demo
+    if (email === "verify@bank.com" && password === "verify@2026") {
+      localStorage.setItem("verifier_email", email);
       setLoading(false);
-      return;
+      navigate("/verifier");
+      onClose();
+    } else {
+      setError("Invalid email or password.");
+      setLoading(false);
     }
-
-    localStorage.setItem("verifier_email", email);
-    setLoading(false);
-    navigate("/verifier");
-    onClose();
   };
 
   if (!open) return null;
@@ -135,10 +134,11 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
-                <p className="text-center text-sm text-muted-foreground">
-                  Demo credentials:{" "}
-                  <span className="text-primary font-mono">admin@sevafoundation.org</span>
-                </p>
+                <div className="bg-secondary rounded-lg p-3 text-center">
+                  <p className="text-xs text-muted-foreground">Demo credentials</p>
+                  <p className="text-xs font-mono text-primary">admin@sevafoundation.org</p>
+                  <p className="text-xs font-mono text-primary">seva@2026</p>
+                </div>
               </form>
             </TabsContent>
 
@@ -173,6 +173,11 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
+                <div className="bg-secondary rounded-lg p-3 text-center">
+                  <p className="text-xs text-muted-foreground">Demo credentials</p>
+                  <p className="text-xs font-mono text-primary">verify@bank.com</p>
+                  <p className="text-xs font-mono text-primary">verify@2026</p>
+                </div>
               </form>
             </TabsContent>
           </Tabs>
