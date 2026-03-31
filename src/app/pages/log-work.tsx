@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { supabase } from "../../lib/supabase";
+
+const NGO_ID = "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
 
 export function LogWork() {
   const [searchQuery, setSearchQuery] = useState("");
   const [workerFound, setWorkerFound] = useState(false);
-  const [workerData, setWorkerData] = useState({
-    name: "",
-    id: "",
-    totalHours: 0,
-  });
+  const [workerData, setWorkerData] = useState<any>(null);
   const [formData, setFormData] = useState({
     workType: "",
     date: new Date().toISOString().split("T")[0],
@@ -17,27 +16,88 @@ export function LogWork() {
     notes: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [error, setError] = useState("");
+  const [searchError, setSearchError] = useState("");
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock search - in real app would query database
-    if (searchQuery) {
-      setWorkerData({
-        name: "Priya S.",
-        id: searchQuery.startsWith("SL-") ? searchQuery : "SL-2025-12345",
-        totalHours: 342,
-      });
-      setWorkerFound(true);
+  const generateHash = (workerId: string, ngoId: string, date: string, workType: string, hours: string) => {
+    const str = `${workerId}-${ngoId}-${date}-${workType}-${hours}-${Date.now()}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
     }
+    return Math.abs(hash).toString(16);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newTotalHours = workerData.totalHours + parseInt(formData.hours);
-    setWorkerData({ ...workerData, totalHours: newTotalHours });
+    setSearching(true);
+    setSearchError("");
+    setWorkerFound(false);
+
+    const query = searchQuery.trim();
+
+    const { data, error } = await supabase
+      .from("workers")
+      .select("*")
+      .or(`phone.eq.${query},sevalog_id.eq.${query}`)
+      .single();
+
+    if (error || !data) {
+      setSearchError("No worker found with that phone number or SevaLog ID.");
+      setSearching(false);
+      return;
+    }
+
+    setWorkerData(data);
+    setWorkerFound(true);
+    setSearching(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const hash = generateHash(
+      workerData.id,
+      NGO_ID,
+      formData.date,
+      formData.workType,
+      formData.hours
+    );
+
+    const { error: logError } = await supabase.from("work_logs").insert({
+      worker_id: workerData.id,
+      ngo_id: NGO_ID,
+      work_type: formData.workType,
+      date: formData.date,
+      hours: parseFloat(formData.hours),
+      location: formData.location,
+      notes: formData.notes,
+      log_hash: hash,
+    });
+
+    if (logError) {
+      setError(logError.message);
+      setLoading(false);
+      return;
+    }
+
+    // Update total hours
+    const newTotalHours = (workerData.total_hours || 0) + parseFloat(formData.hours);
+    await supabase
+      .from("workers")
+      .update({ total_hours: newTotalHours })
+      .eq("id", workerData.id);
+
+    setWorkerData({ ...workerData, total_hours: newTotalHours });
     setSubmitted(true);
-    
-    // Reset submission state after 3 seconds
+    setLoading(false);
+
     setTimeout(() => {
       setSubmitted(false);
       setFormData({
@@ -53,10 +113,7 @@ export function LogWork() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -88,27 +145,32 @@ export function LogWork() {
             </div>
             <button
               type="submit"
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity"
+              disabled={searching}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              Search
+              {searching ? "Searching..." : "Search"}
             </button>
           </div>
+          {searchError && (
+            <p className="text-red-600 text-sm mt-3">{searchError}</p>
+          )}
         </form>
 
-        {/* Work Log Form */}
-        {workerFound && (
+        {/* Worker Found Card */}
+        {workerFound && workerData && (
           <>
             <div className="bg-accent/10 border border-accent/30 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Worker Found</p>
-                  <p className="font-semibold text-foreground">{workerData.name}</p>
-                  <p className="text-sm font-mono text-muted-foreground">{workerData.id}</p>
+                  <p className="font-semibold text-foreground">{workerData.full_name}</p>
+                  <p className="text-sm font-mono text-muted-foreground">{workerData.sevalog_id}</p>
+                  <p className="text-sm text-muted-foreground">{workerData.village} · {workerData.work_type}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-muted-foreground">Total Hours</p>
                   <p className="text-3xl font-semibold text-accent">
-                    {workerData.totalHours}
+                    {workerData.total_hours}
                   </p>
                 </div>
               </div>
@@ -117,8 +179,14 @@ export function LogWork() {
             {submitted && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 text-center">
                 <p className="text-green-700 font-medium">
-                  ✓ Work logged successfully!
+                  ✓ Work logged successfully! SMS sent to worker.
                 </p>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
 
@@ -210,9 +278,10 @@ export function LogWork() {
 
                 <button
                   type="submit"
-                  className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity"
+                  disabled={loading}
+                  className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
-                  Submit Log
+                  {loading ? "Submitting..." : "Submit Log"}
                 </button>
               </div>
             </form>
