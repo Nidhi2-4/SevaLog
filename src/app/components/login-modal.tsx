@@ -137,7 +137,6 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
                 <div className="bg-secondary rounded-lg p-3 text-center">
                   <p className="text-xs text-muted-foreground">Demo credentials</p>
                   <p className="text-xs font-mono text-primary">admin@sevafoundation.org</p>
-                  <p className="text-xs font-mono text-primary">seva@2026</p>
                 </div>
               </form>
             </TabsContent>
