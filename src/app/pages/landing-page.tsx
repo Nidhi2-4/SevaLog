@@ -73,19 +73,6 @@ export function LandingPage() {
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
 
-        {/* Floating cards */}
-        <div className="absolute top-32 right-12 hidden lg:block animate-bounce" style={{ animationDuration: "3s" }}>
-          <div className="bg-white rounded-xl shadow-lg p-4 border border-border w-52">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-              </div>
-              <span className="text-xs font-medium text-foreground">Work Logged!</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Priya S. — 8 hrs</p>
-            <p className="text-xs text-muted-foreground">Health Worker · Pune</p>
-          </div>
-        </div>
 
         <div className="absolute bottom-40 right-20 hidden lg:block animate-bounce" style={{ animationDuration: "4s", animationDelay: "1s" }}>
           <div className="bg-white rounded-xl shadow-lg p-4 border border-border w-48">
