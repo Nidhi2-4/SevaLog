@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Clock, ClipboardList, ExternalLink } from "lucide-react";
+import { Users, Clock, ClipboardList, ExternalLink, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 
@@ -7,164 +7,133 @@ const NGO_ID = "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
 
 export function NGODashboard() {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalWorkers: 0,
-    totalHours: 0,
-    logsThisMonth: 0,
-  });
+  const [stats, setStats] = useState({ totalWorkers: 0, totalHours: 0, logsThisMonth: 0 });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const ngoName = localStorage.getItem("ngo_name") || "Your NGO";
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  useEffect(() => { fetchDashboardData(); }, []);
 
   const fetchDashboardData = async () => {
     setLoading(true);
 
-    // Total workers
     const { count: workerCount } = await supabase
-      .from("workers")
-      .select("*", { count: "exact", head: true })
-      .eq("ngo_id", NGO_ID);
+      .from("workers").select("*", { count: "exact", head: true }).eq("ngo_id", NGO_ID);
 
-    // Total hours
     const { data: hoursData } = await supabase
-      .from("workers")
-      .select("total_hours")
-      .eq("ngo_id", NGO_ID);
+      .from("workers").select("total_hours").eq("ngo_id", NGO_ID);
 
-    const totalHours = hoursData?.reduce(
-      (sum, w) => sum + (w.total_hours || 0), 0
-    ) || 0;
+    const totalHours = hoursData?.reduce((sum, w) => sum + (w.total_hours || 0), 0) || 0;
 
-    // Logs this month
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
 
     const { count: logsCount } = await supabase
-      .from("work_logs")
-      .select("*", { count: "exact", head: true })
-      .eq("ngo_id", NGO_ID)
-      .gte("created_at", startOfMonth.toISOString());
+      .from("work_logs").select("*", { count: "exact", head: true })
+      .eq("ngo_id", NGO_ID).gte("created_at", startOfMonth.toISOString());
 
-    // Recent activity - last 5 logs
     const { data: recentLogs } = await supabase
-      .from("work_logs")
-      .select("*, workers(full_name, sevalog_id)")
-      .eq("ngo_id", NGO_ID)
-      .order("created_at", { ascending: false })
-      .limit(5);
+      .from("work_logs").select("*, workers(full_name, sevalog_id)")
+      .eq("ngo_id", NGO_ID).order("created_at", { ascending: false }).limit(5);
 
-    setStats({
-      totalWorkers: workerCount || 0,
-      totalHours,
-      logsThisMonth: logsCount || 0,
-    });
-
+    setStats({ totalWorkers: workerCount || 0, totalHours, logsThisMonth: logsCount || 0 });
     setRecentActivity(recentLogs || []);
     setLoading(false);
   };
 
+  const statCards = [
+    { label: "Total Workers", value: stats.totalWorkers, icon: Users, color: "bg-primary/10", iconColor: "text-primary", suffix: "" },
+    { label: "Total Hours Logged", value: stats.totalHours, icon: Clock, color: "bg-accent/10", iconColor: "text-accent", suffix: "h" },
+    { label: "Logs This Month", value: stats.logsThisMonth, icon: ClipboardList, color: "bg-green-100", iconColor: "text-green-600", suffix: "" },
+  ];
+
   return (
     <div className="p-8">
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-foreground mb-2">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Overview of your registered workers and recent activity
-        </p>
+        <div className="flex items-center gap-2 mb-1">
+          <TrendingUp className="w-5 h-5 text-accent" />
+          <span className="text-sm text-accent font-medium">{ngoName}</span>
+        </div>
+        <h1 className="text-3xl font-bold text-foreground mb-1">Dashboard</h1>
+        <p className="text-muted-foreground">Overview of your workers and recent activity</p>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+        <div className="flex items-center justify-center py-20">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-muted-foreground text-sm">Loading your dashboard...</p>
+          </div>
+        </div>
       ) : (
         <>
           {/* Stats Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
+            {statCards.map((card) => (
+              <div key={card.label} className="bg-card border border-border rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div className={`w-12 h-12 ${card.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <card.icon className={`w-6 h-6 ${card.iconColor}`} />
                 </div>
+                <p className="text-sm text-muted-foreground mb-1">{card.label}</p>
+                <p className="text-4xl font-bold text-foreground">
+                  {card.value.toLocaleString()}{card.suffix}
+                </p>
               </div>
-              <h3 className="text-sm text-muted-foreground mb-1">Total Workers</h3>
-              <p className="text-3xl font-semibold text-foreground">{stats.totalWorkers}</p>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-accent" />
-                </div>
-              </div>
-              <h3 className="text-sm text-muted-foreground mb-1">Total Hours Logged</h3>
-              <p className="text-3xl font-semibold text-foreground">
-                {stats.totalHours.toLocaleString()}
-              </p>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <ClipboardList className="w-6 h-6 text-primary" />
-                </div>
-              </div>
-              <h3 className="text-sm text-muted-foreground mb-1">Logs This Month</h3>
-              <p className="text-3xl font-semibold text-foreground">{stats.logsThisMonth}</p>
-            </div>
+            ))}
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-card border border-border rounded-lg">
-            <div className="p-6 border-b border-border">
-              <h2 className="text-xl font-semibold text-foreground">Recent Activity</h2>
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="p-6 border-b border-border flex items-center justify-between">
+              <h2 className="text-xl font-bold text-foreground">Recent Activity</h2>
+              <button
+                onClick={() => navigate("/ngo/workers")}
+                className="text-sm text-primary hover:text-primary/80 flex items-center gap-1"
+              >
+                View all workers <ExternalLink className="w-3 h-3" />
+              </button>
             </div>
 
             {recentActivity.length === 0 ? (
-              <div className="p-12 text-center text-muted-foreground">
-                No activity yet. Start logging work!
+              <div className="p-16 text-center">
+                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ClipboardList className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground font-medium mb-2">No activity yet</p>
+                <p className="text-muted-foreground text-sm">Start by registering workers and logging their work hours</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-secondary">
+                  <thead className="bg-secondary/50">
                     <tr>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">Worker</th>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">SevaLog ID</th>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">Date</th>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">Work Type</th>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">Hours</th>
-                      <th className="text-left px-6 py-4 text-sm text-muted-foreground">Action</th>
+                      {["Worker", "SevaLog ID", "Date", "Work Type", "Hours", "Action"].map((h) => (
+                        <th key={h} className="text-left px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{h}</th>
+                      ))}
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-border">
                     {recentActivity.map((activity) => (
-                      <tr key={activity.id} className="border-b border-border last:border-0">
-                        <td className="px-6 py-4 text-foreground">
-                          {activity.workers?.full_name}
-                        </td>
-                        <td className="px-6 py-4 text-foreground font-mono text-sm">
-                          {activity.workers?.sevalog_id}
-                        </td>
+                      <tr key={activity.id} className="hover:bg-secondary/30 transition-colors">
+                        <td className="px-6 py-4 font-medium text-foreground">{activity.workers?.full_name}</td>
+                        <td className="px-6 py-4 font-mono text-sm text-muted-foreground">{activity.workers?.sevalog_id}</td>
                         <td className="px-6 py-4 text-muted-foreground">
-                          {new Date(activity.date).toLocaleDateString("en-IN", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                          {new Date(activity.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                         </td>
-                        <td className="px-6 py-4 text-muted-foreground">
-                          {activity.work_type}
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full font-medium">
+                            {activity.work_type}
+                          </span>
                         </td>
-                        <td className="px-6 py-4 text-foreground">{activity.hours}h</td>
+                        <td className="px-6 py-4 font-bold text-foreground">{activity.hours}h</td>
                         <td className="px-6 py-4">
                           <button
                             onClick={() => navigate(`/worker/${activity.workers?.sevalog_id}`)}
-                            className="text-primary hover:text-primary/80 flex items-center gap-1 text-sm"
+                            className="text-primary hover:text-primary/80 flex items-center gap-1 text-sm font-medium"
                           >
-                            View Profile
-                            <ExternalLink className="w-4 h-4" />
+                            View <ExternalLink className="w-3 h-3" />
                           </button>
                         </td>
                       </tr>

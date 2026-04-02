@@ -1,16 +1,14 @@
 import { Outlet, useNavigate, useLocation } from "react-router";
 import {
-  LayoutDashboard,
-  UserPlus,
-  ClipboardList,
-  Users,
-  Settings as SettingsIcon,
+  LayoutDashboard, UserPlus, ClipboardList, Users, Settings as SettingsIcon, LogOut,
 } from "lucide-react";
-import logo from "/logo.png";
+
+const logo = "/logo.png";
 
 export function NGOLayout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const ngoName = localStorage.getItem("ngo_name") || "NGO Portal";
 
   const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/ngo/dashboard" },
@@ -20,53 +18,65 @@ export function NGOLayout() {
     { icon: SettingsIcon, label: "Settings", path: "/ngo/settings" },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("ngo_id");
+    localStorage.removeItem("ngo_name");
+    localStorage.removeItem("ngo_email");
+    navigate("/");
+  };
+
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <aside className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col">
+        {/* Logo */}
         <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="SevaLog" className="h-10 w-auto" />
-            <span className="text-xl font-semibold">SevaLog</span>
+            <img src={logo} alt="SevaLog" className="h-9 w-auto" />
+            <div>
+              <p className="font-bold text-sidebar-foreground leading-none">SevaLog</p>
+              <p className="text-xs text-sidebar-foreground/50 mt-0.5 truncate max-w-32">{ngoName}</p>
+            </div>
           </div>
         </div>
 
-        <nav className="flex-1 p-4">
-          <ul className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <li key={item.path}>
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "hover:bg-sidebar-accent/50 text-sidebar-foreground/80 hover:text-sidebar-foreground"
-                    }`}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span>{item.label}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+        {/* Nav */}
+        <nav className="flex-1 p-4 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {item.label}
+                {isActive && <div className="ml-auto w-1.5 h-1.5 bg-accent rounded-full" />}
+              </button>
+            );
+          })}
         </nav>
 
+        {/* Logout */}
         <div className="p-4 border-t border-sidebar-border">
           <button
-            onClick={() => navigate("/")}
-            className="w-full px-4 py-2 text-sm text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-sidebar-foreground/50 hover:text-red-400 hover:bg-red-400/10 transition-all"
           >
+            <LogOut className="w-4 h-4" />
             Logout
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-auto">
+      {/* Main */}
+      <main className="flex-1 overflow-auto bg-background">
         <Outlet />
       </main>
     </div>
