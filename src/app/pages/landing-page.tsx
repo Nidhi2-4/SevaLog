@@ -74,25 +74,6 @@ export function LandingPage() {
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
 
 
-        <div className="absolute bottom-40 right-20 hidden lg:block animate-bounce" style={{ animationDuration: "4s", animationDelay: "1s" }}>
-          <div className="bg-white rounded-xl shadow-lg p-4 border border-border w-48">
-            <div className="flex items-center gap-2 mb-1">
-              <Shield className="w-4 h-4 text-primary" />
-              <span className="text-xs font-medium text-foreground">Trust Score</span>
-            </div>
-            <p className="text-2xl font-bold text-primary">87</p>
-            <p className="text-xs text-muted-foreground">342 hrs verified</p>
-          </div>
-        </div>
-
-        <div className="absolute top-48 left-12 hidden lg:block animate-bounce" style={{ animationDuration: "3.5s", animationDelay: "0.5s" }}>
-          <div className="bg-white rounded-xl shadow-lg p-4 border border-border w-44">
-            <p className="text-xs text-muted-foreground mb-1">SMS Sent ✓</p>
-            <p className="text-xs font-medium text-foreground">SevaLog ID:</p>
-            <p className="text-xs font-mono text-primary">SL-2026-48291</p>
-          </div>
-        </div>
-
         {/* Main content */}
         <div className="relative z-10 text-center max-w-5xl mx-auto px-6 pt-20">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-2 rounded-full mb-8 border border-primary/20">
