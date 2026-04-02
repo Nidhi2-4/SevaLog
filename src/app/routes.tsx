@@ -8,12 +8,13 @@ import { Settings } from "./pages/settings";
 import { VerifierPage } from "./pages/verifier-page";
 import { WorkerProfile } from "./pages/worker-profile";
 import { NGOLayout } from "./components/ngo-layout";
+import { AdminLayout } from "./components/admin-layout";
+import { AdminDashboard } from "./pages/admin-dashboard";
+import { AdminNGOs } from "./pages/admin-ngos";
+import { AdminWorkers } from "./pages/admin-workers";
 
 export const router = createBrowserRouter([
-  {
-    path: "/",
-    Component: LandingPage,
-  },
+  { path: "/", Component: LandingPage },
   {
     path: "/ngo",
     Component: NGOLayout,
@@ -26,11 +27,14 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/verifier",
-    Component: VerifierPage,
+    path: "/admin",
+    Component: AdminLayout,
+    children: [
+      { path: "dashboard", Component: AdminDashboard },
+      { path: "ngos", Component: AdminNGOs },
+      { path: "workers", Component: AdminWorkers },
+    ],
   },
-  {
-    path: "/worker/:id",
-    Component: WorkerProfile,
-  },
+  { path: "/verifier", Component: VerifierPage },
+  { path: "/worker/:id", Component: WorkerProfile },
 ]);
