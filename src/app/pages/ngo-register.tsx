@@ -242,9 +242,9 @@ export function NGORegister() {
               <p className="text-center text-sm text-muted-foreground">
                 Already registered?{" "}
                 <button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="text-primary hover:underline font-medium"
+                 type="button"
+                onClick={() => navigate("/?login=true")}
+                className="text-primary hover:underline font-medium"
                 >
                   Login here
                 </button>

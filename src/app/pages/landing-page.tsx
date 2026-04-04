@@ -44,6 +44,14 @@ export function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("login") === "true") {
+      setLoginTab("ngo");
+      setLoginModalOpen(true);
+    }
+  }, []);
+
   const openNGOLogin = () => { setLoginTab("ngo"); setLoginModalOpen(true); };
   const openVerifierLogin = () => { setLoginTab("verifier"); setLoginModalOpen(true); };
 
@@ -69,13 +77,10 @@ export function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-white via-blue-50/30 to-amber-50/20" />
         <div className="absolute top-20 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 left-0 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
 
-
-        {/* Main content */}
         <div className="relative z-10 text-center max-w-5xl mx-auto px-6 pt-20">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-medium px-4 py-2 rounded-full mb-8 border border-primary/20">
             <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
@@ -97,7 +102,7 @@ export function LandingPage() {
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <button
-            onClick={() => navigate("/ngo-register")}
+              onClick={openNGOLogin}
               className="group flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all text-lg font-medium shadow-lg shadow-primary/25"
             >
               NGO Login
@@ -192,7 +197,7 @@ export function LandingPage() {
             ].map((item) => (
               <div key={item.step} className={`relative rounded-2xl border-2 p-8 ${item.color} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
                 <span className="text-6xl font-black text-black/5 absolute top-4 right-6">{item.step}</span>
-                <div className={`w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm`}>
+                <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm">
                   <item.icon className={`w-7 h-7 ${item.iconColor}`} />
                 </div>
                 <h3 className="text-xl font-bold text-primary mb-3">{item.title}</h3>
@@ -308,7 +313,7 @@ export function LandingPage() {
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <button
-              onClick={openNGOLogin}
+              onClick={() => navigate("/ngo-register")}
               className="px-10 py-4 bg-accent text-white rounded-xl hover:opacity-90 transition-opacity text-lg font-medium shadow-lg"
             >
               Register Your NGO
