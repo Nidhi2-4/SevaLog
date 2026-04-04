@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Search } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
-
+const NGO_ID = localStorage.getItem("ngo_id") || "";
 export function LogWork() {
   const [searchQuery, setSearchQuery] = useState("");
   const [workerFound, setWorkerFound] = useState(false);

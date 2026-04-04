@@ -3,8 +3,7 @@ import { Users, Clock, ClipboardList, ExternalLink, TrendingUp } from "lucide-re
 import { useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
-
+const NGO_ID = localStorage.getItem("ngo_id") || "";
 export function NGODashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ totalWorkers: 0, totalHours: 0, logsThisMonth: 0 });

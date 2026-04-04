@@ -12,6 +12,7 @@ import { AdminLayout } from "./components/admin-layout";
 import { AdminDashboard } from "./pages/admin-dashboard";
 import { AdminNGOs } from "./pages/admin-ngos";
 import { AdminWorkers } from "./pages/admin-workers";
+import { NGORegister } from "./pages/ngo-register";
 
 export const router = createBrowserRouter([
   { path: "/", Component: LandingPage },
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: "workers", Component: AdminWorkers },
     ],
   },
+  { path: "/ngo-register", Component: NGORegister },
   { path: "/verifier", Component: VerifierPage },
   { path: "/worker/:id", Component: WorkerProfile },
 ]);

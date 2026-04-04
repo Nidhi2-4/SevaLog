@@ -33,6 +33,7 @@ function CountUp({ end, duration = 2000 }: { end: number; duration?: number }) {
 }
 
 export function LandingPage() {
+  const navigate = useNavigate();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [loginTab, setLoginTab] = useState<"ngo" | "verifier">("ngo");
   const [scrolled, setScrolled] = useState(false);
@@ -59,8 +60,8 @@ export function LandingPage() {
             <button onClick={openVerifierLogin} className="px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors">
               Verify a Worker
             </button>
-            <button onClick={openNGOLogin} className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition-opacity">
-              NGO Login
+            <button onClick={() => navigate("/ngo-register")} className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition-opacity">
+              Register NGO
             </button>
           </div>
         </div>
@@ -96,7 +97,7 @@ export function LandingPage() {
 
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <button
-              onClick={openNGOLogin}
+            onClick={() => navigate("/ngo-register")}
               className="group flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-all text-lg font-medium shadow-lg shadow-primary/25"
             >
               NGO Login
