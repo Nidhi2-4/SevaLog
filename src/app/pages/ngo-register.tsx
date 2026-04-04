@@ -52,14 +52,14 @@ export function NGORegister() {
     }
 
     const { error: dbError } = await supabase.from("ngos").insert({
-      name: form.name,
-      email: form.email,
-      password: form.password,
-      registration_number: form.registration_number,
-      city: form.city,
-      phone: form.phone,
-      status: "active",
-    });
+  name: form.name,
+  email: form.email,
+  password: form.password,
+  registration_number: form.registration_number,
+  city: form.city,
+  phone: form.phone,
+  status: "pending",
+});
 
     if (dbError) {
       setError(dbError.message);
@@ -107,8 +107,8 @@ export function NGORegister() {
             </h2>
             <p className="text-green-700 mb-2 text-lg font-medium">{form.name}</p>
             <p className="text-green-600 mb-8">
-              You can now log in and start registering workers.
-            </p>
+  Your application is under review. You'll be able to log in once approved by the SevaLog admin. This usually takes 24 hours.
+</p>
             <button
               onClick={() => navigate("/")}
               className="px-8 py-4 bg-primary text-primary-foreground rounded-xl hover:opacity-90 transition-opacity text-lg font-medium"

@@ -62,10 +62,22 @@ export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProp
     const { data, error: dbError } = await supabase
       .from("admins").select("*").eq("email", email).eq("password", password).single();
     if (dbError || !data) {
-      setError("Invalid admin credentials.");
-      setLoading(false);
-      return;
-    }
+  setError("Invalid email or password.");
+  setLoading(false);
+  return;
+}
+
+if (data.status === "pending") {
+  setError("Your NGO is pending approval. Please wait for SevaLog admin to approve your account.");
+  setLoading(false);
+  return;
+}
+
+if (data.status === "rejected") {
+  setError("Your NGO registration was rejected. Please contact sevalog.official@gmail.com.");
+  setLoading(false);
+  return;
+}
     localStorage.setItem("admin_id", data.id);
     localStorage.setItem("admin_name", data.name);
     localStorage.setItem("admin_email", data.email);
