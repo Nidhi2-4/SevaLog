@@ -2,8 +2,8 @@ import { useState } from "react";
 import { CheckCircle, Phone } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
-const NGO_NAME = "Seva Foundation";
+const NGO_ID = localStorage.getItem("ngo_id") || "97ca7934-5e2f-4939-97f4-4c6c4c9ab3a8";
+const NGO_NAME = localStorage.getItem("ngo_name") || "Seva Foundation";
 const SUPABASE_URL = "https://iibpqavahozriwjtqsne.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpYnBxYXZhaG96cml3anRxc25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MjY2NzAsImV4cCI6MjA5MDUwMjY3MH0.ka50ktaH7LA7uxcHlbaAlEbfFUQrS3qdTCcTwyfEsfQ";
 
