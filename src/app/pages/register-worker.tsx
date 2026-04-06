@@ -40,80 +40,79 @@ export function RegisterWorker() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    // Send OTP to worker's phone
-    const otpResult = await callEdgeFunction({
-      phone: formData.phoneNumber,
-      type: "send-otp",
-    });
+  const cleanPhone = formData.phoneNumber.replace(/\D/g, "");
+  const phoneWithCode = cleanPhone.startsWith("91") ? `+${cleanPhone}` : `+91${cleanPhone}`;
 
-    console.log("OTP result:", otpResult);
+  const { error: otpError } = await supabase.auth.signInWithOtp({
+    phone: phoneWithCode,
+  });
 
-    if (!otpResult.success) {
-      setError("Failed to send OTP. Please check the phone number.");
-      setLoading(false);
-      return;
-    }
-
-    setStep("otp");
+  if (otpError) {
+    setError("Failed to send OTP: " + otpError.message);
     setLoading(false);
-  };
+    return;
+  }
+
+  setStep("otp");
+  setLoading(false);
+};
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    // Verify OTP
-    const verifyResult = await callEdgeFunction({
-      phone: formData.phoneNumber,
-      code: otp,
-      type: "verify-otp",
-    });
+  const cleanPhone = formData.phoneNumber.replace(/\D/g, "");
+  const phoneWithCode = cleanPhone.startsWith("91") ? `+${cleanPhone}` : `+91${cleanPhone}`;
 
-    console.log("Verify result:", verifyResult);
+  const { error: verifyError } = await supabase.auth.verifyOtp({
+    phone: phoneWithCode,
+    token: otp,
+    type: "sms",
+  });
 
-    if (!verifyResult.success) {
-      setError("Invalid OTP. Please try again.");
-      setLoading(false);
-      return;
-    }
-
-    // OTP verified — now save to database
-    const newId = generateSevalogId();
-
-    const { error: dbError } = await supabase.from("workers").insert({
-      sevalog_id: newId,
-      full_name: formData.fullName,
-      phone: formData.phoneNumber,
-      village: formData.village,
-      work_type: formData.workType,
-      ngo_id: NGO_ID,
-      total_hours: 0,
-    }).select();
-
-    if (dbError) {
-      setError(dbError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Send notification SMS with SevaLog ID
-    await callEdgeFunction({
-      phone: formData.phoneNumber,
-      workerName: formData.fullName,
-      sevalogId: newId,
-      ngoName: NGO_NAME,
-      type: "notify",
-    });
-
-    setGeneratedId(newId);
-    setStep("success");
+  if (verifyError) {
+    setError("Invalid OTP. Please try again.");
     setLoading(false);
-  };
+    return;
+  }
+
+  // OTP verified — save to database
+  const newId = generateSevalogId();
+
+  const { error: dbError } = await supabase.from("workers").insert({
+    sevalog_id: newId,
+    full_name: formData.fullName,
+    phone: formData.phoneNumber,
+    village: formData.village,
+    work_type: formData.workType,
+    ngo_id: NGO_ID,
+    total_hours: 0,
+  }).select();
+
+  if (dbError) {
+    setError(dbError.message);
+    setLoading(false);
+    return;
+  }
+
+  // Send notification SMS with SevaLog ID
+  await callEdgeFunction({
+    phone: formData.phoneNumber,
+    workerName: formData.fullName,
+    sevalogId: newId,
+    ngoName: NGO_NAME,
+    type: "notify",
+  });
+
+  setGeneratedId(newId);
+  setStep("success");
+  setLoading(false);
+};
 
   const handleReset = () => {
     setStep("form");
