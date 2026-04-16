@@ -35,7 +35,7 @@ function CountUp({ end, duration = 2000 }: { end: number; duration?: number }) {
 export function LandingPage() {
   const navigate = useNavigate();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [loginTab, setLoginTab] = useState<"ngo" | "verifier">("ngo");
+  const [loginTab, setLoginTab] = useState<"ngo" | "admin">("ngo");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -53,8 +53,6 @@ export function LandingPage() {
   }, []);
 
   const openNGOLogin = () => { setLoginTab("ngo"); setLoginModalOpen(true); };
-  const openVerifierLogin = () => { setLoginTab("verifier"); setLoginModalOpen(true); };
-
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Navbar */}
@@ -65,7 +63,7 @@ export function LandingPage() {
             <span className="text-xl font-semibold text-primary">SevaLog</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={openVerifierLogin} className="px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors">
+            <button onClick={() => navigate("/verifier")} className="px-5 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-primary-foreground transition-opacity text-sm">
               Verify a Worker
             </button>
             <button onClick={() => navigate("/ngo-register")} className="px-5 py-2 bg-primary text-primary-foreground text-sm rounded-lg hover:opacity-90 transition-opacity">
@@ -109,7 +107,7 @@ export function LandingPage() {
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
-              onClick={openVerifierLogin}
+              onClick={() => navigate("/verifier")}
               className="px-8 py-4 border-2 border-primary text-primary rounded-xl hover:bg-primary hover:text-primary-foreground transition-all text-lg font-medium"
             >
               Verify a Worker
@@ -319,7 +317,7 @@ export function LandingPage() {
               Register Your NGO
             </button>
             <button
-              onClick={openVerifierLogin}
+              onClick={() => navigate("/verifier")}
               className="px-10 py-4 bg-white/10 text-white border border-white/20 rounded-xl hover:bg-white/20 transition-colors text-lg"
             >
               Verify a Worker

@@ -7,7 +7,7 @@ import { supabase } from "../../lib/supabase";
 interface LoginModalProps {
   open: boolean;
   onClose: () => void;
-  defaultTab?: "ngo" | "verifier" | "admin";
+  defaultTab?: "ngo" | "admin";
 }
 
 export function LoginModal({ open, onClose, defaultTab = "ngo" }: LoginModalProps) {
@@ -110,12 +110,9 @@ if (data.status === "rejected") {
             </div>
           )}
           <Tabs defaultValue={defaultTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6 bg-secondary rounded-lg p-1">
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-secondary rounded-lg p-1">
               <TabsTrigger value="ngo" className="rounded-md px-3 py-2 text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
                 NGO
-              </TabsTrigger>
-              <TabsTrigger value="verifier" className="rounded-md px-3 py-2 text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
-                Verifier
               </TabsTrigger>
               <TabsTrigger value="admin" className="rounded-md px-3 py-2 text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
                 Admin
