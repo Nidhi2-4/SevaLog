@@ -3,12 +3,13 @@ import { useNavigate } from "react-router";
 import { Search, ExternalLink } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = localStorage.getItem("ngo_id") || "";
+
 export function MyWorkers() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [workers, setWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const NGO_ID = localStorage.getItem("ngo_id") || "";
 
   useEffect(() => {
     fetchWorkers();

@@ -3,13 +3,14 @@ import { Users, Clock, ClipboardList, ExternalLink, TrendingUp } from "lucide-re
 import { useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = localStorage.getItem("ngo_id") || "";
+
 export function NGODashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ totalWorkers: 0, totalHours: 0, logsThisMonth: 0 });
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const ngoName = localStorage.getItem("ngo_name") || "Your NGO";
+  const NGO_ID = localStorage.getItem("ngo_id") || "";
 
   useEffect(() => { fetchDashboardData(); }, []);
 

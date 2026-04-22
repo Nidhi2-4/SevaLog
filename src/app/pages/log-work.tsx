@@ -19,6 +19,7 @@ export function LogWork() {
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState("");
   const [searchError, setSearchError] = useState("");
+  const NGO_ID = localStorage.getItem("ngo_id") || "";
 
   const generateHash = (workerId: string, ngoId: string, date: string, workType: string, hours: string) => {
     const str = `${workerId}-${ngoId}-${date}-${workType}-${hours}-${Date.now()}`;

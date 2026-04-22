@@ -2,7 +2,7 @@ import { useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
-const NGO_ID = localStorage.getItem("ngo_id") || "";
+
 const NGO_NAME = localStorage.getItem("ngo_name") || "Your NGO";
 const SUPABASE_URL = "https://iibpqavahozriwjtqsne.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpYnBxYXZhaG96cml3anRxc25lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MjY2NzAsImV4cCI6MjA5MDUwMjY3MH0.ka50ktaH7LA7uxcHlbaAlEbfFUQrS3qdTCcTwyfEsfQ";
@@ -19,6 +19,7 @@ export function RegisterWorker() {
   const [generatedId, setGeneratedId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const NGO_ID = localStorage.getItem("ngo_id") || "";
 
   const generateSevalogId = () => {
     const year = new Date().getFullYear();
