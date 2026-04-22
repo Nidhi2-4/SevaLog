@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { Search, ExternalLink } from "lucide-react";
+import { Search, ExternalLink, Trash2 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
 export function AdminWorkers() {
@@ -19,6 +19,13 @@ export function AdminWorkers() {
       .order("created_at", { ascending: false });
     setWorkers(data || []);
     setLoading(false);
+  };
+
+  const handleDelete = async (workerId: string, workerName: string) => {
+    if (!confirm(`Delete ${workerName}? This will also delete all their work logs.`)) return;
+    await supabase.from("work_logs").delete().eq("worker_id", workerId);
+    await supabase.from("workers").delete().eq("id", workerId);
+    fetchWorkers();
   };
 
   const filtered = workers.filter((w) =>
@@ -75,12 +82,20 @@ export function AdminWorkers() {
                   <td className="px-6 py-4 text-muted-foreground">{worker.ngos?.name}</td>
                   <td className="px-6 py-4 font-bold text-foreground">{worker.total_hours}h</td>
                   <td className="px-6 py-4">
-                    <button
-                      onClick={() => navigate(`/worker/${worker.sevalog_id}`)}
-                      className="text-primary hover:text-primary/80 flex items-center gap-1 text-sm"
-                    >
-                      View <ExternalLink className="w-3 h-3" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => navigate(`/worker/${worker.sevalog_id}`)}
+                        className="text-primary hover:text-primary/80 flex items-center gap-1 text-sm"
+                      >
+                        View <ExternalLink className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(worker.id, worker.full_name)}
+                        className="text-red-400 hover:text-red-600 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
